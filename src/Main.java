@@ -1,13 +1,10 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  *
  * @author msilvac
  */
 class Producto {
-
     private String nombre;
     private double precio;
     private int stock;
@@ -45,10 +42,23 @@ class Inventario {
     private static Inventario instancia = null;
     private ArrayList<Producto> listaProductos;
     private ArrayList<Observador> observadores;
+    private List<Venta> ventas;
 
-    private Inventario() {
+    // Método para registrar ganancias
+
+
+    Inventario() {
         listaProductos = new ArrayList<>();
         observadores = new ArrayList<>();
+        ventas = new ArrayList<>();
+
+        Producto leche = new Producto("Leche", 25.0, 50);
+        Producto cereal = new Producto("Cereal", 50.0, 30);
+        Producto yogurt = new Producto("Yogurt", 47.0, 40);
+
+        listaProductos.add(leche);
+        listaProductos.add(cereal);
+        listaProductos.add(yogurt);
     }
 
     public static Inventario obtenerInstancia() {
@@ -72,35 +82,99 @@ class Inventario {
         listaProductos.add(producto);
         notificarObservadores();
     }
-
     public void editarProducto(Producto productoEditado) {
-        // Implementación para editar productos en el inventario
         for (Producto producto : listaProductos) {
             if (producto.getNombre().equalsIgnoreCase(productoEditado.getNombre())) {
-                // Supongamos que quieres actualizar el precio y el stock del producto existente
                 producto.setPrecio(productoEditado.getPrecio());
                 producto.setStock(productoEditado.getStock());
-                // Puedes agregar más lógica según tus necesidades
-                break; // Una vez encontrado y editado, salir del bucle
+                break;
             }
         }
         notificarObservadores();
     }
 
+    public void registrarVenta(Producto producto, int cantidad) {
+        boolean ventaExistente = false;
+        for (Venta venta : ventas) {
+            if (venta.getProducto().equals(producto)) {
+                venta.aumentarCantidad(cantidad);
+                ventaExistente = true;
+                break;
+            }
+        }
+
+        if (!ventaExistente) {
+            ventas.add(new Venta(producto, cantidad));
+        }
+
+        notificarObservadores();
+    }
     public List<Producto> getListaProductos() {
         return listaProductos;
     }
 
     public Producto buscarProducto(String nombre) {
-        // Implementación para buscar productos en el inventario
         for (Producto producto : listaProductos) {
             if (producto.getNombre().equalsIgnoreCase(nombre)) {
                 return producto;
             }
         }
-        return null; // Retorna null si no se encuentra el producto con el nombre especificado
+        return null;
+    }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+    public double calcularMontoVenta(Producto producto, int cantidad) {
+        return producto.getPrecio() * cantidad;
+    }
+
+    public double calcularVentasTotales() {
+        int ventasTotales = 0;
+        for (Venta venta : ventas) {
+            ventasTotales += venta.getCantidad();
+        }
+        return ventasTotales;
+    }
+    public double calcularGananciasTotales() {
+        double gananciasTotales = 0.0;
+        for (Venta venta : ventas) {
+            gananciasTotales += venta.calcularMonto();
+        }
+        return gananciasTotales;
     }
 }
+class Venta {
+    private Producto producto;
+    private int cantidad;
+
+    public Venta(Producto producto, int cantidad) {
+        this.producto = producto;
+        this.cantidad = cantidad;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public double calcularMonto() {
+        return producto.getPrecio() * cantidad;
+    }
+
+    public void aumentarCantidad(int cantidad) {
+        this.cantidad += cantidad;
+    }
+    public void combinarVenta(Venta otraVenta) {
+        if (otraVenta.getProducto().equals(producto)) {
+            cantidad += otraVenta.getCantidad();
+        }
+    }
+}
+
 
 // Interfaz Command
 interface Comando {
@@ -236,6 +310,89 @@ class ComandoMostrar implements Comando {
     }
 }
 
+class ComandoVender implements Comando {
+
+    private Scanner scanner;
+
+    public ComandoVender(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    @Override
+    public void ejecutar() {
+        System.out.println("Ingrese el nombre del producto a vender:");
+        String nombreProducto = scanner.next();
+
+        Inventario inventario = Inventario.obtenerInstancia();
+        Producto productoAVender = inventario.buscarProducto(nombreProducto);
+
+        if (productoAVender != null) {
+            System.out.println("Ingrese la cantidad a vender:");
+            int cantidadVendida = scanner.nextInt();
+
+            if (cantidadVendida <= productoAVender.getStock()) {
+                productoAVender.setStock(productoAVender.getStock() - cantidadVendida);
+                inventario.registrarVenta(productoAVender, cantidadVendida);
+
+                System.out.println("Venta realizada exitosamente.");
+            } else {
+                System.out.println("No hay suficiente stock para la venta.");
+            }
+        } else {
+            System.out.println("Producto no encontrado en el inventario.");
+        }
+    }
+}
+class ComandoMostrarGanancias implements Comando {
+    private Inventario inventario;
+
+    public ComandoMostrarGanancias(Inventario inventario) {
+        this.inventario = inventario;
+    }
+
+    @Override
+    public void ejecutar() {
+        List<Venta> ventas = inventario.getVentas();
+
+        if (!ventas.isEmpty()) {
+            System.out.println("Mostrando ganancias:");
+
+            // Combina las ventas del mismo producto
+            List<Venta> ventasComb = new ArrayList<>();
+            for (Venta venta : ventas) {
+                boolean combinada = false;
+                for (Venta combVenta : ventasComb) {
+                    if (venta.getProducto().equals(combVenta.getProducto())) {
+                        combVenta.combinarVenta(venta);
+                        combinada = true;
+                        break;
+                    }
+                }
+                if (!combinada) {
+                    ventasComb.add(venta);
+                }
+            }
+
+            // Muestra las ventas combinadas
+            for (Venta venta : ventasComb) {
+                System.out.println("Producto: " + venta.getProducto().getNombre());
+                System.out.println("Cantidad: " + venta.getCantidad());
+                System.out.println("Monto: $" + venta.calcularMonto());
+                System.out.println("---------------");
+            }
+
+            // Muestra ganancias totales
+            double gananciasTotales = 0.0;
+            for (Venta venta : ventasComb) {
+                gananciasTotales += venta.calcularMonto();
+            }
+            System.out.println("Ganancias totales: $" + gananciasTotales);
+        } else {
+            System.out.println("No hay ventas registradas.");
+        }
+    }
+}
+
 // Factoría de comandos
 class FabricaComandos {
 
@@ -257,6 +414,10 @@ class FabricaComandos {
                 return new ComandoBuscar(scanner);
             case "MOSTRAR":
                 return new ComandoMostrar(inventario);
+            case "VENDER":
+                return new ComandoVender(scanner);
+            case "GANANCIAS":
+                return new ComandoMostrarGanancias(inventario);
             default:
                 throw new IllegalArgumentException("Comando no válido");
         }
@@ -289,14 +450,15 @@ public class Main {
         // Instanciar observadores
         Observador notificador = new NotificadorInventario();
         inventario.agregarObservador(notificador);
-
         // Menú principal
         while (true) {
             System.out.println("1. Agregar producto");
             System.out.println("2. Editar producto");
             System.out.println("3. Buscar producto");
             System.out.println("4. Mostrar inventario");
-            System.out.println("5. Salir");
+            System.out.println("5. Simular venta");
+            System.out.println("6. Mostrar ganancias");
+            System.out.println("7. Salir");
 
             System.out.print("Seleccione una opción: ");
             int opcion = scanner.nextInt();
@@ -319,6 +481,14 @@ public class Main {
                     comandoMostrar.ejecutar();
                     break;
                 case 5:
+                    Comando comandoVender = fabrica.crearComando("VENDER");
+                    comandoVender.ejecutar();
+                    break;
+                case 6:
+                    Comando comandoMostrarGanancias = fabrica.crearComando("GANANCIAS");
+                    comandoMostrarGanancias.ejecutar();
+                    break;
+                case 7:
                     System.out.println("Saliendo del programa.");
                     System.exit(0);
                 default:
