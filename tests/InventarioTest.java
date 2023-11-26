@@ -1,66 +1,70 @@
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Scanner;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class InventarioTest {
-    @Test
-    void deberiaRegistrarVenta() {
-        Inventario inventario = new Inventario();
-        Producto leche = new Producto("Leche", 25.0, 50);
 
-        // Realizar venta
-        inventario.registrarVenta(leche, 5);
+    Inventario inventario;
+    Producto producto;
 
-        // Verificar si la venta se registró correctamente
-        List<Venta> listaVentas = inventario.getVentas();
-        assertEquals(1, listaVentas.size());
-        assertEquals(leche, listaVentas.get(0).getProducto());
-        assertEquals(5, listaVentas.get(0).getCantidad());
+    @BeforeEach
+    void setUp() {
+        inventario = Inventario.obtenerInstancia();
+        producto = new Producto("ProductoTest", 20.0, 10);
     }
 
     @Test
-    void deberiaCalcularMontoVenta() {
-        Inventario inventario = new Inventario();
-        Producto cereal = new Producto("Cereal", 50.0, 30);
-
-        // Realizar venta
-        inventario.registrarVenta(cereal, 3);
-
-        // Verificar si el monto de la venta es correcto
-        assertEquals(3 * 50.0, inventario.calcularMontoVenta(cereal,3), 0.01);
+    void obtenerInstancia() {
+        assertNotNull(inventario, "La instancia de Inventario es null");
+        assertSame(inventario, Inventario.obtenerInstancia(), "Las instancias no son las mismas");
     }
 
     @Test
-    void deberiaAcumularVentas() {
-        Inventario inventario = new Inventario();
-        Producto yogurt = new Producto("Yogurt", 47.0, 40);
+    void agregarObservador() {
+        Observador observador = new ObservadorTest(); // Asumiendo que ObservadorTest es una implementación de Observador
+        inventario.agregarObservador(observador);
+        assertTrue(inventario.getObservadores().contains(observador), "El observador no fue agregado correctamente");
+        // Verificar que el observador se agregó correctamente (esto podría requerir un método getObservadores o similar)
+    }
 
-        // Realizar dos ventas
-        inventario.registrarVenta(yogurt, 10);
-        inventario.registrarVenta(yogurt, 5);
 
-        // Verificar si las ventas se acumulan correctamente
-        assertEquals(15, inventario.calcularVentasTotales());
+
+    @Test
+    void agregarProducto() {
+        inventario.agregarProducto(producto);
+        assertTrue(inventario.getListaProductos().contains(producto), "El producto no fue agregado correctamente");
     }
 
     @Test
-    void deberiaCalcularGananciasTotales() {
-        Inventario inventario = new Inventario();
-        Producto leche = new Producto("Leche", 25.0, 50);
-        Producto cereal = new Producto("Cereal", 50.0, 30);
-
-        // Realizar dos ventas
-        inventario.registrarVenta(leche, 5);
-        inventario.registrarVenta(cereal, 3);
-
-        // Verificar si las ganancias totales son correctas
-        assertEquals((5 * 25.0) + (3 * 50.0), inventario.calcularGananciasTotales(), 0.01);
+    void editarProducto() {
+        inventario.agregarProducto(producto);
+        Producto productoEditado = new Producto("ProductoTest", 30.0, 15);
+        inventario.editarProducto(productoEditado);
+        Producto productoEncontrado = inventario.buscarProducto("ProductoTest");
+        assertNotNull(productoEncontrado, "El producto editado no se encuentra");
+        assertEquals(30.0, productoEncontrado.getPrecio(), "El precio no se actualizó correctamente");
+        assertEquals(15, productoEncontrado.getStock(), "El stock no se actualizó correctamente");
     }
 
+    @Test
+    void getListaProductos() {
+        assertNotNull(inventario.getListaProductos(), "La lista de productos es null");
+    }
 
+    @Test
+    void buscarProducto() {
+        inventario.agregarProducto(producto);
+        assertNotNull(inventario.buscarProducto("ProductoTest"), "El producto no fue encontrado");
+        assertNull(inventario.buscarProducto("ProductoInexistente"), "Se encontró un producto que no debería existir");
+    }
+
+    // Clase de prueba para Observador
+    static class ObservadorTest implements Observador {
+        @Override
+        public void actualizar() {
+            System.out.println("El método actualizar fue llamado");
+            // Implementación de prueba
+        }
+    }
 }

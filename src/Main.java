@@ -143,6 +143,10 @@ class Inventario {
         }
         return gananciasTotales;
     }
+
+    public ArrayList<Observador> getObservadores(){
+        return observadores;
+    }
 }
 class Venta {
     private Producto producto;
