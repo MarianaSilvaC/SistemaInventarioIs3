@@ -58,19 +58,9 @@ class Inventario {
     }
 
     public void registrarVenta(Producto producto, int cantidad) {
-        boolean ventaExistente = false;
-        for (Venta venta : ventas) {
-            if (venta.getProducto().equals(producto)) {
-                venta.aumentarCantidad(cantidad);
-                ventaExistente = true;
-                break;
-            }
-        }
 
-        if (!ventaExistente) {
-            ventas.add(new Venta(producto, cantidad));
-        }
-
+        Venta venta = new Venta(producto, cantidad, ventas.toArray().length);
+        ventas.add(venta);
         notificarObservadores();
     }
     public List<Producto> getListaProductos() {
@@ -110,5 +100,9 @@ class Inventario {
 
     public ArrayList<Observador> getObservadores(){
         return observadores;
+    }
+
+    public ArrayList<Producto> getProductos(){
+        return listaProductos;
     }
 }

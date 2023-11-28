@@ -10,13 +10,18 @@ class ComandoVender implements Comando {
 
     @Override
     public void ejecutar() {
+        System.out.println("Productos disponibles:");
+        Inventario inventario = Inventario.obtenerInstancia();
+        for (Producto producto : inventario.getProductos()) {
+            System.out.println(producto.getNombre());
+        }
         System.out.println("Ingrese el nombre del producto a vender:");
         String nombreProducto = scanner.next();
 
-        Inventario inventario = Inventario.obtenerInstancia();
         Producto productoAVender = inventario.buscarProducto(nombreProducto);
 
         if (productoAVender != null) {
+            System.out.println("Stock: " + productoAVender.getStock()+ " unidades.\tPrecio: $" + productoAVender.getPrecio());
             System.out.println("Ingrese la cantidad a vender:");
             int cantidadVendida = scanner.nextInt();
 
@@ -26,6 +31,7 @@ class ComandoVender implements Comando {
 
                 System.out.println("Venta realizada exitosamente.");
             } else {
+
                 System.out.println("No hay suficiente stock para la venta.");
             }
         } else {
