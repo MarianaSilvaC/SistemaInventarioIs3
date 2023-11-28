@@ -1,0 +1,4 @@
+interface Comando {
+
+    void ejecutar();
+}

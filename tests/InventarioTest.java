@@ -53,9 +53,13 @@ class InventarioTest {
     }
 
     @Test
-    void buscarProducto() {
+    void buscarProductoExistente() {
         inventario.agregarProducto(producto);
         assertNotNull(inventario.buscarProducto("ProductoTest"), "El producto no fue encontrado");
+    }
+
+    @Test
+    void buscarProductoInexistente() {
         assertNull(inventario.buscarProducto("ProductoInexistente"), "Se encontró un producto que no debería existir");
     }
 
@@ -64,7 +68,7 @@ class InventarioTest {
         @Override
         public void actualizar() {
             System.out.println("El método actualizar fue llamado");
-            // Implementación de prueba
+
         }
     }
 }
