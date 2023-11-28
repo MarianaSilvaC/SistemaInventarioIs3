@@ -102,7 +102,4 @@ class Inventario {
         return observadores;
     }
 
-    public ArrayList<Producto> getProductos(){
-        return listaProductos;
-    }
 }

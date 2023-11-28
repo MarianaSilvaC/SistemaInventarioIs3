@@ -12,7 +12,7 @@ class ComandoVender implements Comando {
     public void ejecutar() {
         System.out.println("Productos disponibles:");
         Inventario inventario = Inventario.obtenerInstancia();
-        for (Producto producto : inventario.getProductos()) {
+        for (Producto producto : inventario.getListaProductos()) {
             System.out.println(producto.getNombre());
         }
         System.out.println("Ingrese el nombre del producto a vender:");
