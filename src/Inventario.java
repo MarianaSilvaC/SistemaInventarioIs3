@@ -1,6 +1,17 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * La clase Inventario es responsable de la gestión y seguimiento de los productos y ventas
+ * en un sistema de inventario. Implementa el patrón Singleton para asegurar una única instancia
+ * de la clase. Esta clase permite agregar, editar y buscar productos en el inventario, además
+ * de registrar ventas. Cada vez que se realiza una operación significativa en el inventario,
+ * se notifica a una lista de observadores sobre el cambio. La clase también proporciona
+ * funcionalidades para calcular el monto total de una venta, las ventas totales y las ganancias
+ * totales. Así, Inventario actúa como un punto centralizado para gestionar y monitorear
+ * las transacciones de productos y sus respectivas informaciones en el sistema.
+ */
+
 class Inventario {
 
     private static Inventario instancia = null;

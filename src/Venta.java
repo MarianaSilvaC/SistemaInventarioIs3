@@ -1,6 +1,14 @@
 import java.util.Date;
 import java.util.concurrent.atomic.DoubleAccumulator;
 
+/**
+ * La clase Venta representa una transacción de venta de un producto.
+ * Esta clase gestiona la información relacionada con la venta de un producto específico,
+ * incluyendo el producto vendido, la cantidad vendida, la fecha de la venta, y el ID único
+ * de la venta. Permite calcular el monto total de la venta en base al precio del producto y
+ * la cantidad vendida. La clase también ofrece funcionalidades para aumentar la cantidad
+ * de productos vendidos y combinar ventas de productos idénticos en una sola transacción.
+ */
 class Venta {
     private Producto producto;
     private int cantidad;
@@ -15,7 +23,7 @@ class Venta {
         this.fecha = new Date();
         this.producto = producto;
         this.cantidad = cantidad;
-        this.ganancia = producto.getPrecio() * (double) cantidad;
+        this.ganancia = calcularMonto();
     }
 
     public Producto getProducto() {
