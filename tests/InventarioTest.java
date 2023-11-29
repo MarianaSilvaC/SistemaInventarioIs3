@@ -22,10 +22,9 @@ class InventarioTest {
 
     @Test
     void agregarObservador() {
-        Observador observador = new ObservadorTest(); // Asumiendo que ObservadorTest es una implementación de Observador
+        Observador observador = new ObservadorTest();
         inventario.agregarObservador(observador);
         assertTrue(inventario.getObservadores().contains(observador), "El observador no fue agregado correctamente");
-        // Verificar que el observador se agregó correctamente (esto podría requerir un método getObservadores o similar)
     }
 
 

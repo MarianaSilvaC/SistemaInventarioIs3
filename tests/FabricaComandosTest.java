@@ -39,6 +39,24 @@ class FabricaComandosTest {
         assertNotNull(comando, "El comando no fue creado correctamente");
     }
 
+    @Test
+    void crearComandoMostrar() {
+        Comando comando = fabrica.crearComando("MOSTRAR");
+        assertNotNull(comando, "El comando no fue creado correctamente");
+    }
+
+    @Test
+    void crearComandoVender() {
+        Comando comando = fabrica.crearComando("VENDER");
+        assertNotNull(comando, "El comando no fue creado correctamente");
+    }
+
+    @Test
+    void crearComandoGanancias() {
+        Comando comando = fabrica.crearComando("GANANCIAS");
+        assertNotNull(comando, "El comando no fue creado correctamente");
+    }
+
 
 
 
